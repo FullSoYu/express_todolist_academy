@@ -3,6 +3,7 @@ import express from "express";
 import mysql from "mysql2/promise";
 
 const app = express();
+
 app.use(express.json());
 
 const port = 3000;
@@ -16,8 +17,26 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+app.get("/todos/:id/:contentId", async (req, res) => {
+  // params 여러개 받기
+  const data = {
+    todos: {
+      id: req.params.id,
+      contentId: req.params.contentId,
+    },
+  };
+
+  const {
+    todos: { id, contentId },
+  } = data;
+
+  console.log("id", id);
+});
+
 app.get("/todos", async (req, res) => {
   const [rows] = await pool.query("SELECT * FROM todo ORDER BY id DESC");
+
+  getData();
   res.json(rows);
 });
 
@@ -97,27 +116,25 @@ app.delete("/todos/:id", async (req, res) => {
   const [[todoRow]] = await pool.query(
     `
     SELECT *
-    FROME todo
-    WHERE = ?`,
+    FROM todo
+    WHERE id = ?`,
     [id]
   );
 
   if (todoRow === undefined) {
     res.status(404).json({
-      msg: " not found",
+      msg: "not found",
     });
     return;
   }
+
   const [rs] = await pool.query(
-    `
-    DELETE
-    FROM tood
-    WHERE id = ?
-    `,
+    `DELETE FROM todo
+    WHERE id = ?`,
     [id]
   );
   res.json({
-    msg: `${id}번 할일이 삭제 되었습니다.`,
+    msg: `${id}번 할일이 삭제되었습니다.`,
   });
 });
 
