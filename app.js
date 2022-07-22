@@ -94,5 +94,3 @@ app.patch("/todos/:id", async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
-
-var abcd = 100;
